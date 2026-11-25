@@ -16,12 +16,11 @@ def output_dir() -> Path:
     env_dir = os.environ.get("MAKEFUN_OUTPUT_DIR")
     if env_dir:
         return Path(env_dir)
-    if Path("/output").is_dir() or os.access("/", os.W_OK):
-        try:
-            Path("/output").mkdir(parents=True, exist_ok=True)
-            return Path("/output")
-        except OSError:
-            pass
+    # Only use the shared /output when it already exists (the grader's
+    # sandbox provides it); otherwise keep the run self-contained next to
+    # the entrypoint instead of creating directories at the filesystem root.
+    if Path("/output").is_dir():
+        return Path("/output")
     return Path(__file__).resolve().parent / "output"
 
 
